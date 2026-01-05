@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("v1/imagens")
+@RequestMapping("image")
 @Slf4j
 public class imageController {
 
