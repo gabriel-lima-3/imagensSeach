@@ -1,5 +1,5 @@
 package gabriel_lima_3.imagelitapi.domain.entity;
-import gabriel_lima_3.imagelitapi.Enums.ImageExtendions;
+import gabriel_lima_3.imagelitapi.domain.enums.ImageExtensions;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 
-public class image {
+public class Image {
 
     @Id
     @GeneratedValue (strategy = GenerationType.UUID)
@@ -30,7 +30,7 @@ public class image {
     private Long size;
     @Column
     @Enumerated (EnumType.ORDINAL)
-    private ImageExtendions images;
+    private ImageExtensions extensions;
     @Column
     @CreatedDate ()
     private LocalDateTime uploadoTime;
