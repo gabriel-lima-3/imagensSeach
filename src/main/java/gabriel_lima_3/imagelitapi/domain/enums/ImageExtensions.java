@@ -1,5 +1,6 @@
 package gabriel_lima_3.imagelitapi.domain.enums;
 
+import lombok.Getter;
 import org.springframework.http.MediaType;
 
 import java.util.Arrays;
@@ -10,6 +11,7 @@ public enum ImageExtensions {
     JPEG(MediaType.IMAGE_JPEG),
     GIF(MediaType.IMAGE_GIF);
 
+    @Getter
     private MediaType mediaType;
 
     ImageExtensions(MediaType mediaType) {

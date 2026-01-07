@@ -1,28 +1,27 @@
 package gabriel_lima_3.imagelitapi.applications;
-
 import gabriel_lima_3.imagelitapi.domain.entity.Image;
-import gabriel_lima_3.imagelitapi.domain.enums.ImageExtensions;
 import gabriel_lima_3.imagelitapi.domain.service.ImageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
-@RequestMapping("image")
+@RequestMapping("/image")
 @Slf4j
 @RequiredArgsConstructor
 public class ImageController {
 
     private final ImageService service;
+    private final ImageMapper mapper;
 
 
     @PostMapping("/save")
@@ -33,19 +32,34 @@ public class ImageController {
             throws IOException {
         log.info("imagem recebida: nome: {}, tamanho: {}  ", file.getOriginalFilename(), file.getSize());
 
+        Image image = mapper.mapToImage(file, name, tags);
+        Image savedImage = service.save(image);
+        URI imageUri = BuildImageUrl(savedImage);
 
+        return ResponseEntity.created(imageUri).build();
+    }
 
-        Image image = Image.builder()
-                .name(name)
-                .tags(String.join(",", tags))
-                .size(file.getSize())
-                .extensions(ImageExtensions.fromMediaType(MediaType.valueOf(file.getContentType())))
-                .files(file.getBytes())
-                .build();
+    @GetMapping("/{id}")
+    public ResponseEntity<byte[]> getImage(@PathVariable UUID id){
+        System.out.println("Recebido id: " + id);
+        var possibleImage = service.getById(id);
+        if (possibleImage.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+        var image = possibleImage.get();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(image.getExtensions().getMediaType());
+        headers.setContentLength(image.getSize());
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + image.getFileName() + "\"");
+        return new ResponseEntity<>(image.getFiles(), headers, HttpStatus.OK);
 
-        service.save(image);
+    }
 
-        return ResponseEntity.ok().build();
+    private URI BuildImageUrl(Image image){
+        return ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/image/{id}")
+                .buildAndExpand(image.getId())
+                .toUri();
     }
 
 }

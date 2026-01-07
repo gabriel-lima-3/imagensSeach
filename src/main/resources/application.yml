@@ -4,7 +4,12 @@ spring:
     username: postgres
     password: postgres
   jpa:
-    database: POSTGRESQL
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
     show-sql: true
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+ 
