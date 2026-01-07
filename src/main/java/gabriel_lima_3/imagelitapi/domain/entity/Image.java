@@ -29,7 +29,7 @@ public class Image {
     @Column
     private Long size;
     @Column
-    @Enumerated (EnumType.ORDINAL)
+    @Enumerated (EnumType.STRING)
     private ImageExtensions extensions;
     @Column
     @CreatedDate ()
