@@ -9,6 +9,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name ="tb_image")
@@ -22,7 +23,7 @@ public class Image {
 
     @Id
     @GeneratedValue (strategy = GenerationType.UUID)
-    private String id;
+    private UUID id;
 
     @Column
     private String name;
@@ -39,6 +40,11 @@ public class Image {
     @Column
     @Lob
     private byte[] files;
+
+    public String getFileName(){
+       return getName().concat(".").concat(getExtensions().name());
+    }
+
 
 
 }
