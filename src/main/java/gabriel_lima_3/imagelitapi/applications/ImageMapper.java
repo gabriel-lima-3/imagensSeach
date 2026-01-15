@@ -20,8 +20,17 @@ public class ImageMapper {
                 .files(file.getBytes())
                 .build();
 
+    }
 
+    public ImageDTO domainToDTO(Image image, String url){
 
+        return ImageDTO.builder()
+                .url(url)
+                .extension(image.getExtensions().name())
+                .name(image.getName())
+                .size(image.getSize())
+                .uploadDate(image.getUploadoTime().toLocalDate())
+                .build();
     }
 
 }
