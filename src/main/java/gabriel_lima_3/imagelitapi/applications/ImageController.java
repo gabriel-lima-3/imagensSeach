@@ -1,5 +1,6 @@
 package gabriel_lima_3.imagelitapi.applications;
 import gabriel_lima_3.imagelitapi.domain.entity.Image;
+import gabriel_lima_3.imagelitapi.domain.enums.ImageExtensions;
 import gabriel_lima_3.imagelitapi.domain.service.ImageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/image")
@@ -54,6 +56,28 @@ public class ImageController {
         return new ResponseEntity<>(image.getFiles(), headers, HttpStatus.OK);
 
     }
+
+
+    //localhost:8080/image?extension=PNG&Query= Nature
+
+    @GetMapping
+    public ResponseEntity<List<ImageDTO>> search(
+            @RequestParam(value = "extension", required = false) String extension,
+            @RequestParam (value = "query", required = false) String query ){
+
+       var result = service.search(ImageExtensions.valueOf(extension), query);
+
+        var images = result.stream().map(image -> {
+
+           var url = BuildImageUrl(image);
+
+          return mapper.domainToDTO(image, url.toString());
+       }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(images);
+    }
+
+
 
     private URI BuildImageUrl(Image image){
         return ServletUriComponentsBuilder.fromCurrentContextPath()
