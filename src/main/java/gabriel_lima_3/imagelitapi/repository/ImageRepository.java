@@ -20,7 +20,7 @@ public interface ImageRepository extends JpaRepository<Image, UUID>, JpaSpecific
 
         if (extensions != null){
              //AND EXTENSION = 'PNG'
-            Specification<Image> extensionEqual = (root, q, cb) ->cb.equal(root.get("extension"), extensions);
+            Specification<Image> extensionEqual = (root, q, cb) ->cb.equal(root.get("extensions"), extensions);
             spec = spec.and(extensionEqual);
         }
         if (StringUtils.hasText(query)){

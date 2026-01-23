@@ -1,4 +1,5 @@
 package gabriel_lima_3.imagelitapi.applications;
+
 import gabriel_lima_3.imagelitapi.domain.entity.Image;
 import gabriel_lima_3.imagelitapi.domain.enums.ImageExtensions;
 import gabriel_lima_3.imagelitapi.domain.service.ImageService;
@@ -7,9 +8,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
@@ -57,15 +60,20 @@ public class ImageController {
 
     }
 
-
     //localhost:8080/image?extension=PNG&Query= Nature
 
     @GetMapping
     public ResponseEntity<List<ImageDTO>> search(
-            @RequestParam(value = "extension", required = false) String extension,
-            @RequestParam (value = "query", required = false) String query ){
 
-       var result = service.search(ImageExtensions.valueOf(extension), query);
+            @RequestParam(value = "extension", required = false, defaultValue = "") String extension,
+            @RequestParam(value = "query", required = false) String query) {
+
+        // Converte para Enum apenas se não estiver vazio
+        ImageExtensions extensionEnum = StringUtils.hasText(extension)
+                ? ImageExtensions.valueOf(extension.toUpperCase())
+                : null;
+
+        var result = service.search(extensionEnum, query);
 
         var images = result.stream().map(image -> {
 
@@ -76,7 +84,6 @@ public class ImageController {
 
         return ResponseEntity.ok(images);
     }
-
 
 
     private URI BuildImageUrl(Image image){
