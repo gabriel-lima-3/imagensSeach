@@ -70,7 +70,7 @@ public class ImageController {
 
         // Converte para Enum apenas se não estiver vazio
         ImageExtensions extensionEnum = StringUtils.hasText(extension)
-                ? ImageExtensions.valueOf(extension.toUpperCase())
+                ? ImageExtensions.OfName(extension.toUpperCase())
                 : null;
 
         var result = service.search(extensionEnum, query);
@@ -87,7 +87,7 @@ public class ImageController {
 
 
     private URI BuildImageUrl(Image image){
-        return ServletUriComponentsBuilder.fromCurrentContextPath()
+        return ServletUriComponentsBuilder.fromCurrentRequestUri()
                 .path("/image/{id}")
                 .buildAndExpand(image.getId())
                 .toUri();
