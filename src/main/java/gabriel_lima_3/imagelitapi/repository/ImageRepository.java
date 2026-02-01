@@ -2,6 +2,8 @@ package gabriel_lima_3.imagelitapi.repository;
 
 import gabriel_lima_3.imagelitapi.domain.entity.Image;
 import gabriel_lima_3.imagelitapi.domain.enums.ImageExtensions;
+import gabriel_lima_3.imagelitapi.repository.specs.GerenicSpecs;
+import gabriel_lima_3.imagelitapi.repository.specs.ImageSpecs;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -14,27 +16,16 @@ public interface ImageRepository extends JpaRepository<Image, UUID>, JpaSpecific
 
     default List<Image> findByExtensionAndNameOrTagsLike(ImageExtensions extensions, String query ){
 
-        //SELECET * FROM WHERE 1 = 1
-        Specification<Image> conjunction = (root, q, criteriaBuilder) -> criteriaBuilder.conjunction();
-        Specification<Image> spec = Specification.where(conjunction);
+        Specification<Image> spec = Specification.where(GerenicSpecs.conjunctions());
+
 
         if (extensions != null){
-             //AND EXTENSION = 'PNG'
-            Specification<Image> extensionEqual = (root, q, cb) ->cb.equal(root.get("extensions"), extensions);
-            spec = spec.and(extensionEqual);
+
+            spec = spec.and(ImageSpecs.extensionEqual(extensions));
         }
         if (StringUtils.hasText(query)){
 
-            // AND ( NAME LIKE "QUERY" OR TAGS LIKE "QUERY"
-            // RIVER = %RI% - % faz pesquisa com que pode vir antes ou depois
-            //
-
-            Specification<Image> nameLike = (root, q, cb) -> cb.like(cb.upper(root.get("name")),"%" +  query.toUpperCase() + "%");
-            Specification<Image> tagsLike = (root, q, cb) -> cb.like(cb.upper(root.get("tags")), "%" + query.toUpperCase() + "%");
-
-            Specification<Image> namesOrTagsLike =  Specification.anyOf(nameLike, tagsLike);
-
-            spec = spec.and(namesOrTagsLike);
+            spec = spec.and(Specification.anyOf(ImageSpecs.nameLike(query), ImageSpecs.tagsLike(query)));
 
         }
 
